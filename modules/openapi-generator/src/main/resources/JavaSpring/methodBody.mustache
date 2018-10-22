@@ -1,32 +1,9 @@
 {{^reactive}}
-{{#examples}}
-    {{#-first}}
-        {{#jdk8}}
-            {{#async}}
-return CompletableFuture.supplyAsync(()-> {
-            {{/async}}getRequest().ifPresent(request -> {
-{{#async}}    {{/async}}            {{/jdk8}}for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
-    {{/-first}}
-{{#async}}        {{/async}}{{^async}}{{#jdk8}}    {{/jdk8}}{{/async}}            if (mediaType.isCompatibleWith(MediaType.valueOf("{{{contentType}}}"))) {
-{{#async}}        {{/async}}{{^async}}{{#jdk8}}    {{/jdk8}}{{/async}}                ApiUtil.setExampleResponse(request, "{{{contentType}}}", "{{#lambdaRemoveLineBreak}}{{#lambdaEscapeDoubleQuote}}{{{example}}}{{/lambdaEscapeDoubleQuote}}{{/lambdaRemoveLineBreak}}");
-{{#async}}        {{/async}}{{^async}}{{#jdk8}}    {{/jdk8}}{{/async}}                break;
-{{#async}}        {{/async}}{{^async}}{{#jdk8}}    {{/jdk8}}{{/async}}            }
-    {{#-last}}
-{{#async}}        {{/async}}{{^async}}{{#jdk8}}    {{/jdk8}}{{/async}}        }
-        {{#jdk8}}
-{{#async}}    {{/async}}        });
-        {{/jdk8}}
-{{#async}}    {{/async}}        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-        {{#jdk8}}
-            {{#async}}
-        }, Runnable::run);
-            {{/async}}
-        {{/jdk8}}
-    {{/-last}}
-{{/examples}}
-{{^examples}}
-return {{#jdk8}}{{#async}}CompletableFuture.completedFuture({{/async}}{{/jdk8}}new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED){{#jdk8}}{{#async}}){{/async}}{{/jdk8}};
-{{/examples}}
+String endpoint = ((Api)({{classname}}.class).getAnnotation(Api.class)).value();
+
+        {{classname}}Service service = getService();
+        service.setEndpoint(endpoint);
+        return service.{{operationId}}(getRequest().get(){{#bodyParams}}, {{paramName}}{{/bodyParams}});
 {{/reactive}}
 {{#reactive}}
 exchange.getResponse().setStatusCode(HttpStatus.NOT_IMPLEMENTED);
