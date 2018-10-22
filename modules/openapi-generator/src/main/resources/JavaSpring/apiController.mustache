@@ -1,5 +1,7 @@
 package {{package}};
 
+import com.acms.platform.caradapter.service.easyLife.{{classname}}Service;
+
 {{^jdk8}}
 {{#imports}}import {{import}};
 {{/imports}}
@@ -70,16 +72,27 @@ public class {{classname}}Controller implements {{classname}} {
     {{^reactive}}
 
     private final NativeWebRequest request;
+    private {{classname}}Service service;
 
     @org.springframework.beans.factory.annotation.Autowired
     public {{classname}}Controller(NativeWebRequest request) {
         this.request = request;
+    }
+    
+    @org.springframework.beans.factory.annotation.Autowired
+    public void set{{classname}}Service({{classname}}Service service) {
+        this.service = service;
     }
     {{#jdk8}}
 
     @Override
     public Optional<NativeWebRequest> getRequest() {
         return Optional.ofNullable(request);
+    }
+
+    @Override
+    public {{classname}}Service getService() {
+        return service;
     }
     {{/jdk8}}
     {{/reactive}}

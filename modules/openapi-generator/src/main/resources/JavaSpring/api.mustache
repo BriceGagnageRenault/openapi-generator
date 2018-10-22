@@ -36,7 +36,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 {{/reactive}}
 
-import com.acms.platform.caradapter.service.{{classname}}Service;
+import com.acms.platform.caradapter.service.{{title}}.{{classname}}Service;
 
 {{#useBeanValidation}}
 import javax.validation.Valid;
@@ -68,6 +68,10 @@ public interface {{classname}} {
 
     default Optional<NativeWebRequest> getRequest() {
         return Optional.empty();
+    }
+
+    default {{classname}}Service getService() {
+        return null;
     }
         {{/reactive}}
     {{/isDelegate}}
@@ -104,9 +108,11 @@ public interface {{classname}} {
         method = RequestMethod.{{httpMethod}})
     {{#jdk8}}default {{/jdk8}}{{#responseWrapper}}{{.}}<{{/responseWrapper}}ResponseEntity<{{>returnTypes}}>{{#responseWrapper}}>{{/responseWrapper}} {{#delegate-method}}_{{/delegate-method}}{{operationId}}({{#allParams}}{{>queryParams}}{{>pathParams}}{{>headerParams}}{{>bodyParams}}{{>formParams}}{{#hasMore}},{{/hasMore}}{{^hasMore}}{{#reactive}}, {{/reactive}}{{/hasMore}}{{/allParams}}{{#reactive}}ServerWebExchange exchange{{/reactive}}){{^jdk8}};{{/jdk8}}{{#jdk8}} {
 
-        {{classname}}Service service = new {{classname}}Service();
-        return service.{{operationId}}({{#allParams}}{{paramName}}{{#hasMore}},{{/hasMore}}{{^hasMore}}{{#reactive}}, {{/reactive}}{{/hasMore}}{{/allParams}});
-    
+        String endpoint = ((Api)({{classname}}.class).getAnnotation(Api.class)).value();
+
+        {{classname}}Service service = getService();
+        service.setEndpoint(endpoint);
+        return service.{{operationId}}(getRequest().get(){{#bodyParams}}, {{paramName}}{{/bodyParams}});
      }{{/jdk8}}
 
 {{/operation}}
